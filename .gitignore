@@ -1,0 +1,66 @@
+# --- OS / Editor ---
+.DS_Store
+Thumbs.db
+*~
+
+# JetBrains
+.idea/
+
+# VS Code
+.vscode/
+
+# Vim
+*.swp
+*.swo
+
+# --- Node / JS / TS ---
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Build outputs
+dist/
+build/
+out/
+
+# Vite (explicit)
+client/dist/
+
+# TypeScript incremental builds
+*.tsbuildinfo
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Env files (keep secrets out of git)
+.env
+.env.*
+!.env.example
+
+# --- Cloudflare / Wrangler ---
+# Wrangler state/cache directories
+.wrangler/
+**/.wrangler/
+
+# Wrangler local vars (if you create them)
+.dev.vars
+.dev.vars.*
+
+# Durable Objects local storage (wrangler dev often creates sqlite files)
+*.sqlite
+*.sqlite3
+
+# --- Misc ---
+*.log
