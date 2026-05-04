@@ -14,7 +14,7 @@ Right now the frontend is deployed **through the Cloudflare Worker** (the Worker
 ### Deploy steps
 1. Build the client:
    ```bash
-   cd client
+   cd app/client
    npm install
    npm run build
    ```
@@ -32,13 +32,13 @@ API endpoints (for now) are served from the same deployment (e.g. `/api/hello`).
 ## Local development (quick)
 - Worker:
   ```bash
-  cd server
+  cd apps/server
   npm install
   wrangler dev
   ```
 - Client:
   ```bash
-  cd client
+  cd apps/client
   npm install
   npm run dev
   ```
