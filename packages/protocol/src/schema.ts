@@ -1,13 +1,11 @@
 import { z } from "zod";
+import { zRole, zTeam } from "./domain";
 
 /**
  * Note: We validate Client -> Server messages strictly.
  * Server -> Client messages are produced by us, so validation there is optional
  * (but can still be useful in tests).
  */
-
-export const zTeam = z.enum(["red", "blue"]);
-export const zRole = z.enum(["spymaster", "guesser", "spectator"]);
 
 export const zClientMessage = z.discriminatedUnion("type", [
 	z.object({
@@ -21,7 +19,8 @@ export const zClientMessage = z.discriminatedUnion("type", [
 	z.object({
 		type: z.literal("select_role"),
 		team: zTeam,
-		role: z.enum(["spymaster", "guesser"]),
+		// Keep this explicit: spectators can't be selected via this intent.
+		role: zRole.extract(["spymaster", "guesser"]),
 	}),
 	z.object({
 		type: z.literal("leave_room"),
