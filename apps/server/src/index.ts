@@ -63,3 +63,8 @@ export default {
         return new Response(greeting);
     },
 } satisfies ExportedHandler<Env>;
+
+function parseClientMessage(raw: unknown): ClientMessageParsed {
+	// This proves the server is using the shared runtime schema + inferred type.
+	return zClientMessage.parse(raw);
+}
