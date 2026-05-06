@@ -5,7 +5,7 @@ export type {
 	Role,
 	ClientMessage,
 	ServerMessage,
-} from "./messages";
+} from "./messages.ts";
 
-export { zClientMessage, zTeam, zRole } from "./schemas";
-export type { ClientMessageParsed } from "./schemas";
+export { zClientMessage, zTeam, zRole } from "./schema.ts";
+export type { ClientMessageParsed } from "./schema.ts";
