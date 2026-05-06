@@ -14,7 +14,10 @@ export type PlayerId = string & { readonly __brand: "PlayerId" };
 export type Team = "red" | "blue";
 export type Role = "spymaster" | "guesser" | "spectator";
 
-/** Client -> Server */
+/** Client -> Server 
+ * The ClientMessage represents the "intent payload"
+ */
+
 export type ClientMessage =
 	| {
 			type: "join_room";
