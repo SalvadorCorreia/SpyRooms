@@ -14,7 +14,7 @@ Right now the frontend is deployed **through the Cloudflare Worker** (the Worker
 ### Deploy steps
 1. Build the client:
    ```bash
-   cd app/client
+   cd apps/client
    npm install
    npm run build
    ```
