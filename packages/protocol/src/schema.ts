@@ -1,12 +1,7 @@
 import { z } from "zod";
 import { zRole, zTeam } from "./domain";
 
-/**
- * Note: We validate Client -> Server messages strictly.
- * Server -> Client messages are produced by us, so validation there is optional
- * (but can still be useful in tests).
- */
-
+/** Runtime schema used to validate untrusted client intents. */
 export const zClientMessage = z.discriminatedUnion("type", [
 	z.object({
 		type: z.literal("join_room"),
@@ -19,7 +14,6 @@ export const zClientMessage = z.discriminatedUnion("type", [
 	z.object({
 		type: z.literal("select_role"),
 		team: zTeam,
-		// Keep this explicit: spectators can't be selected via this intent.
 		role: zRole.extract(["spymaster", "guesser"]),
 	}),
 	z.object({
@@ -31,5 +25,5 @@ export const zClientMessage = z.discriminatedUnion("type", [
 	}),
 ]);
 
-/** Convenience type: inferred from schema (always stays in sync). */
+/** Parsed client intent type inferred from `zClientMessage`. */
 export type ClientMessageParsed = z.infer<typeof zClientMessage>;

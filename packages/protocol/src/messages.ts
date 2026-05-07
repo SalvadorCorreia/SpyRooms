@@ -1,27 +1,17 @@
-/**
- * Shared wire protocol between client and server.
- *
- * Conventions:
- * - Every message must have a `type` discriminant.
- * - Messages are JSON-serializable.
- * - Client -> Server messages are treated as untrusted input and must be validated at runtime.
- */
-
-/** Branded string types help prevent accidental mixing of IDs. */
+/** Shared wire protocol types used by client and server messages. */
 export type RoomId = string & { readonly __brand: "RoomId" };
 export type PlayerId = string & { readonly __brand: "PlayerId" };
 
+/** Team assignment used by game entities and role selection. */
 export type Team = "red" | "blue";
+/** Role assignment supported by the game. */
 export type Role = "spymaster" | "guesser" | "spectator";
 
-/** Client -> Server 
- * The ClientMessage represents the "intent payload"
- */
-
+/** Union of intents sent from client to server. */
 export type ClientMessage =
 	| {
 			type: "join_room";
-			roomId: string; // server validates and coerces to RoomId internally
+			roomId: string;
 	  }
 	| {
 			type: "set_name";
@@ -40,7 +30,7 @@ export type ClientMessage =
 			nonce: string;
 	  };
 
-/** Server -> Client */
+/** Union of events emitted from server to client. */
 export type ServerMessage =
 	| {
 			type: "room_state";
