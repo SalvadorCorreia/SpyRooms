@@ -1,6 +1,6 @@
-# OpaqueAuth Commit Guidelines
+# SpyRooms Commit Guidelines
 
-OpaqueAuth strictly follows the [Conventional Commits](https://www.conventionalcommits.org/) specification. A clean Git history isn't just aesthetic; it makes debugging easier and automated versioning possible.
+SpyRooms follows the [Conventional Commits](https://www.conventionalcommits.org/) specification. A clean Git history makes debugging easier and helps automation.
 
 If your commit message does not follow this format, it will be rejected.
 
@@ -25,11 +25,11 @@ Every commit must use the following structure:
 * `chore`: Minor repository maintenance, dependency updates, or `.gitignore` changes.
 
 ## Allowed Scopes
-The scope tells us which part of the monorepo you touched:
-* `core`: The Rust `guessrank-core` crate.
-* `api`: The ConnectRPC backend microservice.
-* `client`: The TypeScript NPM wrapper.
-* `infra`: Monorepo config, CI/CD, workspaces.
+The scope should reflect the area changed in this monorepo:
+* `client`: React/Vite frontend in `apps/client`.
+* `server`: Cloudflare Worker + Durable Object backend in `apps/server`.
+* `protocol`: Shared wire/domain protocol package in `packages/protocol`.
+* `infra`: Monorepo config, docs, tooling, and CI/workspace files.
 
 ## Issue Tracking
 If your commit addresses a GitHub issue, you must include it in the footer.

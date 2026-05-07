@@ -1,18 +1,13 @@
 import { z } from "zod";
 import type { PlayerId, Role, RoomId, Team } from "./messages";
 
-/**
- * Shared domain models.
- *
- * These types represent canonical shapes used by both client and server.
- * Zod schemas are included so types can be inferred and (optionally) validated in tests.
- */
-
-/** Ground-truth enums used across the repo. */
+/** Shared domain models and schemas used by client and server. */
 export const zTeam = z.enum(["red", "blue"]);
 export const zRole = z.enum(["spymaster", "guesser", "spectator"]);
 
+/** Parsed team literal inferred from `zTeam`. */
 export type TeamParsed = z.infer<typeof zTeam>;
+/** Parsed role literal inferred from `zRole`. */
 export type RoleParsed = z.infer<typeof zRole>;
 
 /** Branded IDs are strings at runtime; branding is compile-time only. */
@@ -28,6 +23,7 @@ export type Player = {
     connected: boolean;
 };
 
+/** Runtime schema for `Player`. */
 export const zPlayer = z.object({
     playerId: zPlayerId,
     name: z.string().trim().min(1).max(32),
@@ -38,8 +34,10 @@ export const zPlayer = z.object({
 
 /** Public-facing card kind (Codename-style). */
 export type CardKind = Team | "neutral" | "assassin";
+/** Runtime schema for `CardKind`. */
 export const zCardKind = z.enum(["red", "blue", "neutral", "assassin"]) satisfies z.ZodType<CardKind>;
 
+/** A card shown on the room board. */
 export type Card = {
     cardId: string;
     word: string;
@@ -47,6 +45,7 @@ export type Card = {
     revealed: boolean;
 };
 
+/** Runtime schema for `Card`. */
 export const zCard = z.object({
     cardId: z.string().min(1).max(64),
     word: z.string().trim().min(1).max(64),
@@ -56,8 +55,10 @@ export const zCard = z.object({
 
 /** High-level game phase. */
 export type GamePhase = "lobby" | "setup" | "playing" | "finished";
+/** Runtime schema for `GamePhase`. */
 export const zGamePhase = z.enum(["lobby", "setup", "playing", "finished"]);
 
+/** Canonical state snapshot for a room. */
 export type GameState = {
     roomId: RoomId;
     phase: GamePhase;
@@ -65,6 +66,7 @@ export type GameState = {
     board: Card[];
 };
 
+/** Runtime schema for `GameState`. */
 export const zGameState = z.object({
     roomId: zRoomId,
     phase: zGamePhase,
