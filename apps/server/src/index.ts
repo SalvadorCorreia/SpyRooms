@@ -3,7 +3,7 @@ import { zClientMessage, type ClientMessage } from "@spyrooms/protocol";
 import { URL } from "node:url";
 
 /** Durable Object used for RPC demonstration and future room state logic. */
-export class MyDurableObject extends DurableObject<Env> {
+export class GameRoom extends DurableObject<Env> {
     constructor(ctx: DurableObjectState, env: Env) {
         super(ctx, env);
     }
@@ -29,12 +29,12 @@ export default {
             if (!isValidRoomId(roomId)) {
                 return new Response("Invalid room id.", { status: 400 });
             }
-            const id = env.MY_DURABLE_OBJECT.idFromName(roomId);
-            const stub = env.MY_DURABLE_OBJECT.get(id);
+            const id = env.GAME_ROOM.idFromName(roomId);
+            const stub = env.GAME_ROOM.get(id);
 
             return stub.fetch(request);
         }
-        const stub = env.MY_DURABLE_OBJECT.getByName("foo");
+        const stub = env.GAME_ROOM.getByName("foo");
         const greeting = await stub.sayHello("world");
         return new Response(greeting);
     },
