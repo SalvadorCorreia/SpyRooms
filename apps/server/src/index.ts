@@ -1,5 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
-import { zClientMessage, type ClientMessage } from "@spyrooms/protocol";
+import { zClientMessage, type ClientMessage, type ClientMessageParsed } from "@spyrooms/protocol";
 import { URL } from "node:url";
 
 /** Durable Object used for RPC demonstration and future room state logic. */
@@ -14,8 +14,85 @@ export class GameRoom extends DurableObject<Env> {
     }
 
     async fetch(request: Request): Promise<Response> {
-        const url = new URL(request.url);
-        return new Response(`DO reached for path=${url.pathname}`, { status: 200 });
+        const upgrade = request.headers.get("Upgrade");
+        if (upgrade?.toLowerCase() !== "websocket") {
+            return new Response("Expected WebSocket upgrade", { status: 426 });
+        }
+
+        const pair = new WebSocketPair();
+        const [client, server] = Object.values(pair);
+
+        server.accept();
+
+        server.addEventListener("close", (ev) => {
+            console.log("ws close", ev.code, ev.reason);
+        });
+
+        server.addEventListener("error", (ev) => {
+            console.log("ws error", ev);
+        });
+
+        server.addEventListener("message", (ev) => {
+            try {
+                if (typeof ev.data !== "string") {
+                    server.send(
+                        JSON.stringify({
+                            type: "error",
+                            code: "invalid_message",
+                            message: "Expected text frame",
+                        }),
+                    );
+                    return;
+                }
+
+                const MAX_WS_MESSAGE_BYTES = 4 * 1024;
+
+                if (ev.data.length > MAX_WS_MESSAGE_BYTES) {
+                    server.send(JSON.stringify({
+                        type: "error",
+                        code: "invalid_message",
+                        message: "Message too large",
+                    }));
+                    return;
+                }
+
+                const parsedJson = JSON.parse(ev.data);
+                const parsed = zClientMessage.safeParse(parsedJson);
+
+                if (!parsed.success) {
+                    server.send(
+                        JSON.stringify({
+                            type: "error",
+                            code: "invalid_message",
+                            message: parsed.error.message,
+                        }),
+                    );
+                    return;
+                }
+
+                const msg: ClientMessageParsed = parsed.data;
+
+                if (msg.type === "ping") {
+                    server.send(JSON.stringify({ type: "pong", nonce: msg.nonce }));
+                    return;
+                }
+
+
+                console.log("validated message", msg.type);
+            } catch (err) {
+                server.send(
+                    JSON.stringify({
+                        type: "error",
+                        code: "invalid_message",
+                        message: err instanceof Error ? err.message : "Unknown parse error",
+                    }),
+                );
+            }
+        });
+
+
+
+        return new Response(null, { status: 101, webSocket: client });
     }
 }
 
