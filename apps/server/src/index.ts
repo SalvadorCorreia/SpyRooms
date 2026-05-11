@@ -13,6 +13,51 @@ export class GameRoom extends DurableObject<Env> {
         return `Hello, ${name}!`;
     }
 
+    private connections = new Set<WebSocket>();
+    private lastActivityBySocket = new WeakMap<WebSocket, number>();
+    private reaperIntervalId: number | null = null;
+
+    private static readonly IDLE_TIMEOUT_MS = 60_000;
+    private static readonly REAPER_TICK_MS = 15_000;
+
+    private markActive(ws: WebSocket): void {
+        this.lastActivityBySocket.set(ws, Date.now());
+    }
+
+    private startReaperIfNeeded(): void {
+        if (this.reaperIntervalId !== null) return;
+
+        this.reaperIntervalId = setInterval(() => {
+            this.reapIdleConnections();
+        }, GameRoom.REAPER_TICK_MS) as unknown as number;
+    }
+
+    private stopReaperIfIdle(): void {
+        if (this.connections.size > 0) return;
+        if (this.reaperIntervalId === null) return;
+
+        clearInterval(this.reaperIntervalId);
+        this.reaperIntervalId = null;
+    }
+
+    private reapIdleConnections(): void {
+        const now = Date.now();
+
+        for (const ws of this.connections) {
+            const last = this.lastActivityBySocket.get(ws) ?? now;
+            if (now - last > GameRoom.IDLE_TIMEOUT_MS) {
+                try {
+                    ws.close(1000, "idle_timeout");
+                } catch {
+                    // If close throws for any reason, remove it to avoid spinning forever.
+                    this.connections.delete(ws);
+                }
+            }
+        }
+
+        this.stopReaperIfIdle();
+    }
+
     async fetch(request: Request): Promise<Response> {
         const upgrade = request.headers.get("Upgrade");
         if (upgrade?.toLowerCase() !== "websocket") {
@@ -24,12 +69,20 @@ export class GameRoom extends DurableObject<Env> {
 
         server.accept();
 
+        this.connections.add(server);
+        this.markActive(server);
+        this.startReaperIfNeeded();
+
         server.addEventListener("close", (ev) => {
             console.log("ws close", ev.code, ev.reason);
+            this.connections.delete(server);
+            this.stopReaperIfIdle();
         });
 
         server.addEventListener("error", (ev) => {
             console.log("ws error", ev);
+            this.connections.delete(server);
+            this.stopReaperIfIdle();
         });
 
         server.addEventListener("message", (ev) => {
@@ -45,9 +98,9 @@ export class GameRoom extends DurableObject<Env> {
                     return;
                 }
 
-                const MAX_WS_MESSAGE_BYTES = 4 * 1024;
+                const MAX_WS_MESSAGE_CHARS = 4 * 1024;
 
-                if (ev.data.length > MAX_WS_MESSAGE_BYTES) {
+                if (ev.data.length > MAX_WS_MESSAGE_CHARS) {
                     server.send(JSON.stringify({
                         type: "error",
                         code: "invalid_message",
@@ -71,6 +124,7 @@ export class GameRoom extends DurableObject<Env> {
                 }
 
                 const msg: ClientMessageParsed = parsed.data;
+                this.markActive(server);
 
                 if (msg.type === "ping") {
                     server.send(JSON.stringify({ type: "pong", nonce: msg.nonce }));
