@@ -150,6 +150,8 @@ export class GameRoom extends DurableObject<Env> {
     }
 }
 
+const ROOM_WS_PREFIX = "room";
+
 export default {
     /** Handles requests and proxies a call to the Durable Object instance. */
     async fetch(request, env, ctx): Promise<Response> {
@@ -172,11 +174,11 @@ export default {
 } satisfies ExportedHandler<Env>;
 
 function getRoomIdFromPath(pathname: string): string | null {
-    // Expected: /ws/<roomId>
+    // Expected: /room/<roomId>
     // Split carefully to avoid empty segments.
     const parts = pathname.split("/").filter(Boolean);
     if (parts.length !== 2) return null;
-    if (parts[0] !== "ws") return null;
+    if (parts[0] !== ROOM_WS_PREFIX) return null;
     return parts[1];
 }
 
