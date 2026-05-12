@@ -1,11 +1,12 @@
 import { z } from "zod";
 import { zRole, zTeam } from "./domain";
+import { zRoomIdString } from "./ids";
 
 /** Runtime schema used to validate untrusted client intents. */
 export const zClientMessage = z.discriminatedUnion("type", [
 	z.object({
 		type: z.literal("join_room"),
-		roomId: z.string().min(1).max(64),
+		roomId: zRoomIdString,
 	}),
 	z.object({
 		type: z.literal("set_name"),

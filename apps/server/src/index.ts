@@ -1,5 +1,6 @@
 import { DurableObject } from "cloudflare:workers";
 import { zClientMessage, type ClientMessage, type ClientMessageParsed } from "@spyrooms/protocol";
+import { ROOM_ID_MIN_LEN, ROOM_ID_MAX_LEN, ROOM_ID_RE } from "@spyrooms/protocol";
 import { URL } from "node:url";
 
 /** Durable Object used for RPC demonstration and future room state logic. */
@@ -183,8 +184,8 @@ function getRoomIdFromPath(pathname: string): string | null {
 }
 
 function isValidRoomId(roomId: string): boolean {
-    // Keep it strict and cheap.
-    return /^[a-z0-9-]{1,16}$/.test(roomId);
+    if (roomId.length < ROOM_ID_MIN_LEN || roomId.length > ROOM_ID_MAX_LEN) return false;
+    return ROOM_ID_RE.test(roomId);
 }
 
 /** Parses and validates an untrusted client payload with the shared schema. */

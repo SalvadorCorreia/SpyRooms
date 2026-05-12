@@ -1,5 +1,6 @@
 import { z } from "zod";
-import type { PlayerId, Role, RoomId, Team } from "./messages";
+import type { PlayerId, Role, RoomId, Team } from "./messages.ts";
+import { zRoomIdString, zPlayerIdString } from "./ids.ts";
 
 /** Shared domain models and schemas used by client and server. */
 export const zTeam = z.enum(["red", "blue"]);
@@ -11,8 +12,8 @@ export type TeamParsed = z.infer<typeof zTeam>;
 export type RoleParsed = z.infer<typeof zRole>;
 
 /** Branded IDs are strings at runtime; branding is compile-time only. */
-const zRoomId = z.string().min(1).max(64) as unknown as z.ZodType<RoomId>;
-const zPlayerId = z.string().min(1).max(64) as unknown as z.ZodType<PlayerId>;
+const zRoomId = zRoomIdString as unknown as z.ZodType<RoomId>;
+const zPlayerId = zPlayerIdString as unknown as z.ZodType<PlayerId>;
 
 /** A single player in a room. */
 export type Player = {
