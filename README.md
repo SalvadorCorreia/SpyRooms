@@ -42,3 +42,5 @@ API endpoints (for now) are served from the same deployment (e.g. `/api/hello`).
   npm install
   npm run dev
   ```
+
+Alternative pnpm approaches are also possible
