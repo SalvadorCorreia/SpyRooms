@@ -151,3 +151,7 @@ export class GameRoom extends DurableObject<Env> {
     }
 }
 
+/** Parses and validates an untrusted client payload with the shared schema. */
+function parseClientMessage(raw: unknown): ClientMessage {
+    return zClientMessage.parse(raw);
+}

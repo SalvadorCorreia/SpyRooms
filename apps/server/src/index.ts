@@ -1,7 +1,4 @@
-import { GameRoom } from "./do/GameRoom.ts";
 export { GameRoom } from "./do/GameRoom";
-import { zClientMessage, type ClientMessage, type ClientMessageParsed } from "@spyrooms/protocol";
-import { URL } from "node:url";
 import { getRoomIdFromPath, isValidRoomId } from "./http/roomRouting";
 
 
@@ -25,10 +22,3 @@ export default {
         return new Response(greeting);
     },
 } satisfies ExportedHandler<Env>;
-
-
-
-/** Parses and validates an untrusted client payload with the shared schema. */
-function parseClientMessage(raw: unknown): ClientMessage {
-    return zClientMessage.parse(raw);
-}
