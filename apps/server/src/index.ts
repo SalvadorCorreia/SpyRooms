@@ -17,8 +17,6 @@ export default {
 
             return stub.fetch(request);
         }
-        const stub = env.GAME_ROOM.getByName("foo");
-        const greeting = await stub.sayHello("world");
-        return new Response(greeting);
+        return env.ASSETS.fetch(request);
     },
 } satisfies ExportedHandler<Env>;
